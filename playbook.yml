@@ -1,0 +1,17 @@
+- hosts: all
+  gather_facts: False
+  vars:
+    etcd_version: 3.3.8
+  remote_user: root
+  become: yes
+  tasks:
+    - name: Create etcd directory
+      file: path=/opt/etcd state=directory
+    - name: Download and extract etcd binaries
+      unarchive:
+        src: https://github.com/coreos/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz
+        remote_src: yes
+        dest: /opt/etcd/
+        creates: /opt/etcd/etcd-v{{ etcd_version }}-linux-amd64/
+    - name: Update etcd current symlink
+      file: path=/opt/etcd/current src=/opt/etcd/etcd-v{{ etcd_version }}-linux-amd64/ state=link force=yes
